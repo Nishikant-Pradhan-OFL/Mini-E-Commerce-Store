@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Your Cart - MiniShop</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <div class="logo">MiniShop</div>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="cart.html">
+       Cart <span id="cart-count" class="cart-badge">0</span>
+      </a>
+    </nav>
+  </header>
+
+  <section class="cart">
+    <h2>Your Cart</h2>
+    <div id="cart-items"></div>
+    <p id="total-price"></p>
+  </section>
+
+  <footer>
+    <p>© 2025 LeoMiniShop. All rights reserved.</p>
+  </footer>
+
+<script>
+  let rawCart = JSON.parse(localStorage.getItem('cart')) || [];
+
+  // Group items by name
+  function groupCartItems(cartArray) 
+  {
+    const grouped = {};
+    cartArray.forEach(item => {
+      if (!grouped[item.name]) 
+      {
+        grouped[item.name] = { ...item, quantity: 1 };
+      } 
+      else 
+      {
+        grouped[item.name].quantity += 1;
+      }
+    });
+    return Object.values(grouped);
+  }
+
+  function saveCart(groupedCart) 
+  {
+    // Flatten grouped cart to raw format
+    const flatCart = [];
+    groupedCart.forEach(item => {
+      for (let i = 0; i < item.quantity; i++) 
+      {
+        flatCart.push({ name: item.name, price: item.price });
+      }
+    });
+    localStorage.setItem('cart', JSON.stringify(flatCart));
+  }
+
+  function displayCart() 
+  {
+    const groupedCart = groupCartItems(rawCart);
+    const cartItems = document.getElementById('cart-items');
+    const totalPrice = document.getElementById('total-price');
+
+    if (groupedCart.length === 0) 
+    {
+      cartItems.innerHTML = "<p>Your cart is empty.</p>";
+      totalPrice.textContent = "";
+      return;
+    }
+
+    let total = 0;
+    cartItems.innerHTML = groupedCart.map((item, index) => {
+      total += item.price * item.quantity;
+      return `
+        <div class="product-card">
+          <h3>${item.name}</h3>
+          <p>Price: ₹${item.price} x ${item.quantity} = ₹${item.price * item.quantity}</p>
+          <div class="qty-buttons">
+            <button onclick="changeQty(${index}, -1)">−</button>
+            <span>${item.quantity}</span>
+            <button onclick="changeQty(${index}, 1)">+</button>
+            <button onclick="removeItem(${index})">Remove</button>
+          </div>
+        </div>
+      `;
+    }).join("");
+
+    totalPrice.textContent = `Total Price: ₹${total}`;
+  }
+
+  function changeQty(index, delta) 
+  {
+    let grouped = groupCartItems(rawCart);
+    grouped[index].quantity += delta;
+    if (grouped[index].quantity <= 0) 
+    {
+      grouped.splice(index, 1);
+    }
+    saveCart(grouped);
+    rawCart = JSON.parse(localStorage.getItem('cart'));
+    displayCart();
+  }
+
+  function removeItem(index) 
+  {
+    let grouped = groupCartItems(rawCart);
+    grouped.splice(index, 1);
+    saveCart(grouped);
+    rawCart = JSON.parse(localStorage.getItem('cart'));
+    displayCart();
+  }
+
+  displayCart();
+</script>
+</body>
+</html>

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Checkout - MiniShop</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <div class="logo">MiniShop</div>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="cart.html">
+        Cart <span id="cart-count" class="cart-badge">0</span>
+      </a>
+    </nav>
+  </header>
+
+  <section class="checkout">
+    <h2>Checkout</h2>
+    <form id="checkoutForm">
+      <input type="text" placeholder="Full Name" required name="name" />
+      <input type="email" placeholder="Email Address" required name="email" />
+      <textarea placeholder="Shipping Address" required name="address"></textarea>
+      <button type="submit">Place Order</button>
+    </form>
+    <p id="orderStatus"></p>
+  </section>
+
+  <footer>
+    <p>© 2025 MiniShop. All rights reserved.</p>
+  </footer>
+
+  <script>
+    document.getElementById('checkoutForm').addEventListener('submit', function(e) 
+    {
+      e.preventDefault();
+      localStorage.removeItem('cart');
+      document.getElementById('orderStatus').textContent = "✅ Order placed successfully!";
+      this.reset();
+    });
+  </script>
+</body>
+</html>
